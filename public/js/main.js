@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskForm = document.getElementById('taskForm');
     const taskList = document.getElementById('taskList');
     const messageContainer = document.getElementById('messageContainer');
-    const BASE_URL = 'http://localhost:5001';  // Make sure this matches your server's port
+    const BASE_URL = 'http://localhost:5001';  // Ensure this matches your server's port
 
     // Load tasks from the server
     function loadTasks() {
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const due = document.getElementById('taskDue').value;
 
         if (name && created && due) {
-            const task = { name, note, createdAt: created, dueDate: due, completed: false, reminder: null };
+            const task = { name, note, createdAt: created, dueDate: due };
             fetch(`${BASE_URL}/tasks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -51,8 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Edit a task
-    function editTask(id) {
-        const name = prompt("New task name:");
+    function editTask(id, taskElement) {
+        const name = prompt('Enter new task name:', taskElement.querySelector('.taskName').textContent);
         if (name) {
             fetch(`${BASE_URL}/tasks/${id}`, {
                 method: 'PUT',
@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(response => response.json())
             .then(updatedTask => {
-                loadTasks(); // Reload tasks to reflect changes
+                taskElement.querySelector('.taskName').textContent = updatedTask.name;
+                displayMessage('Task updated successfully.', 'success');
             })
             .catch(error => {
                 console.error(error);
@@ -71,21 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Delete a task
-    function deleteTask(id) {
-        fetch(`${BASE_URL}/tasks/${id}`, {
-            method: 'DELETE'
-        })
-        .then(() => {
-            loadTasks(); // Reload tasks after deletion
-        })
-        .catch(error => {
-            console.error(error);
-            displayMessage('Error deleting task: ' + error, 'error');
-        });
+    function deleteTask(id, taskElement) {
+        fetch(`${BASE_URL}/tasks/${id}`, { method: 'DELETE' })
+            .then(() => {
+                taskElement.remove();
+                displayMessage('Task deleted successfully.', 'success');
+            })
+            .catch(error => {
+                console.error(error);
+                displayMessage('Error deleting task: ' + error, 'error');
+            });
     }
 
     // Mark task as complete
-    function markTaskComplete(id) {
+    function markTaskComplete(id, taskElement) {
         fetch(`${BASE_URL}/tasks/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -93,17 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(response => response.json())
         .then(updatedTask => {
-            loadTasks(); // Reload tasks to reflect changes
+            taskElement.querySelector('.taskInfo').style.textDecoration = 'line-through';
+            displayMessage('Task marked as complete.', 'success');
         })
         .catch(error => {
             console.error(error);
-            displayMessage('Error updating task status: ' + error, 'error');
+            displayMessage('Error marking task as complete: ' + error, 'error');
         });
     }
 
-    // Set a reminder for a task
+    // Set a reminder
     function setReminder(id) {
-        const reminder = prompt("Reminder text:");
+        const reminder = prompt('Enter reminder text:');
         if (reminder) {
             fetch(`${BASE_URL}/tasks/${id}`, {
                 method: 'PUT',
@@ -112,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(response => response.json())
             .then(updatedTask => {
-                loadTasks(); // Reload tasks to reflect changes
+                displayMessage('Reminder set successfully.', 'success');
             })
             .catch(error => {
                 console.error(error);
@@ -134,38 +135,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create a task element
     function createTaskElement(task) {
         const taskElement = document.createElement('div');
-        taskElement.className = 'task';
-
-        const taskInfo = document.createElement('div');
-        taskInfo.textContent = `${task.name} - ${task.createdAt} - ${task.dueDate}`;
-        if (task.completed) {
-            taskInfo.style.textDecoration = 'line-through';
-        }
-
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
-        editButton.addEventListener('click', () => editTask(task.id));
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.addEventListener('click', () => deleteTask(task.id));
-
-        const completeButton = document.createElement('button');
-        completeButton.textContent = task.completed ? 'Unmark Complete' : 'Mark Complete';
-        completeButton.addEventListener('click', () => markTaskComplete(task.id));
-
-        const reminderButton = document.createElement('button');
-        reminderButton.textContent = 'Set Reminder';
-        reminderButton.addEventListener('click', () => setReminder(task.id));
-
-        taskElement.appendChild(taskInfo);
-        taskElement.appendChild(editButton);
-        taskElement.appendChild(deleteButton);
-        taskElement.appendChild(completeButton);
-        taskElement.appendChild(reminderButton);
-
+        taskElement.classList.add('taskElement');
+        taskElement.innerHTML = `
+            <span class="taskName">${task.name}</span> - ${task.createdAt} - ${task.dueDate}
+            <button onclick="editTask('${task.id}', this.parentElement)">Edit</button>
+            <button onclick="deleteTask('${task.id}', this.parentElement)">Delete</button>
+            <button onclick="markTaskComplete('${task.id}', this.parentElement)">Mark Complete</button>
+            <button onclick="setReminder('${task.id}')">Set Reminder</button>
+        `;
         return taskElement;
     }
+
+    window.editTask = editTask;
+    window.deleteTask = deleteTask;
+    window.markTaskComplete = markTaskComplete;
+    window.setReminder = setReminder;
 
     loadTasks();
 });
