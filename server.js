@@ -1,8 +1,15 @@
+
 const express = require('express');
 const path = require('path');
 
-const app = express();
-const port = process.env.PORT || 5000;
+// 
+
+const port = process.env.PORT || 5001;  // Change 5000 to 5001
+
+
+// const app = express();
+
+// const port = process.env.PORT || 5000;
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
