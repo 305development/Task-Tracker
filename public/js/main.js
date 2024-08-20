@@ -23,13 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add a new task
     document.getElementById('addTaskButton').addEventListener('click', () => {
-        const name = document.getElementById('taskName').value;
-        const note = document.getElementById('taskNote').value;
-        const created = document.getElementById('taskCreated').value;
-        const due = document.getElementById('taskDue').value;
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const dueDate = document.getElementById('dueDate').value;
 
-        if (name && created && due) {
-            const task = { name, note, createdAt: created, dueDate: due };
+        if (title && dueDate) {
+            const task = { title, description, dueDate };
             fetch(`${BASE_URL}/tasks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -52,16 +51,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Edit a task
     function editTask(id, taskElement) {
-        const name = prompt('Enter new task name:', taskElement.querySelector('.taskName').textContent);
-        if (name) {
+        const title = prompt('Enter new task title:', taskElement.querySelector('.taskTitle').textContent);
+        const description = prompt('Enter new task description:', taskElement.querySelector('.taskDescription').textContent);
+        if (title) {
             fetch(`${BASE_URL}/tasks/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name })
+                body: JSON.stringify({ title, description })
             })
             .then(response => response.json())
             .then(updatedTask => {
-                taskElement.querySelector('.taskName').textContent = updatedTask.name;
+                taskElement.querySelector('.taskTitle').textContent = updatedTask.title;
+                taskElement.querySelector('.taskDescription').textContent = updatedTask.description;
                 displayMessage('Task updated successfully.', 'success');
             })
             .catch(error => {
@@ -137,11 +138,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const taskElement = document.createElement('div');
         taskElement.classList.add('taskElement');
         taskElement.innerHTML = `
-            <span class="taskName">${task.name}</span> - ${task.createdAt} - ${task.dueDate}
-            <button onclick="editTask('${task.id}', this.parentElement)">Edit</button>
-            <button onclick="deleteTask('${task.id}', this.parentElement)">Delete</button>
-            <button onclick="markTaskComplete('${task.id}', this.parentElement)">Mark Complete</button>
-            <button onclick="setReminder('${task.id}')">Set Reminder</button>
+            <div class="taskInfo">
+                <h3 class="taskTitle">${task.title}</h3>
+                <p class="taskDescription">${task.description}</p>
+                <p>Due Date: ${new Date(task.dueDate).toLocaleString()}</p>
+            </div>
+            <button onclick="editTask('${task._id}', this.parentElement)">Edit</button>
+            <button onclick="deleteTask('${task._id}', this.parentElement)">Delete</button>
+            <button onclick="markTaskComplete('${task._id}', this.parentElement)">Mark Complete</button>
+            <button onclick="setReminder('${task._id}')">Set Reminder</button>
         `;
         return taskElement;
     }
