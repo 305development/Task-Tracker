@@ -72,17 +72,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Delete a task
+    // Delete a task with confirmation for permanent deletion
     function deleteTask(id, taskElement) {
-        fetch(`${BASE_URL}/tasks/${id}`, { method: 'DELETE' })
-            .then(() => {
-                taskElement.remove();
-                displayMessage('Task deleted successfully.', 'success');
-            })
-            .catch(error => {
-                console.error(error);
-                displayMessage('Error deleting task: ' + error, 'error');
-            });
+        const confirmation = confirm("Do you want to delete this task?");
+        if (confirmation) {
+            const deleteForever = confirm("Are you sure you want to delete this task forever?");
+            if (deleteForever) {
+                fetch(`${BASE_URL}/tasks/${id}`, { method: 'DELETE' })
+                    .then(() => {
+                        taskElement.remove();
+                        displayMessage('Task deleted permanently.', 'success');
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        displayMessage('Error deleting task: ' + error, 'error');
+                    });
+            } else {
+                displayMessage('Task deletion canceled.', 'info');
+            }
+        } else {
+            displayMessage('Task deletion canceled.', 'info');
+        }
     }
 
     // Mark task as complete
@@ -103,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Set a reminder
+    // Set a reminder with alarm functionality
     function setReminder(id, taskElement) {
         const existingReminder = taskElement.querySelector('.taskReminder').textContent;
         const reminder = prompt('Enter or edit reminder text:', existingReminder);
