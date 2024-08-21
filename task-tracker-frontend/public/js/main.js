@@ -117,16 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Show modal for deleting task
-    function showDeleteModal(taskElement, id) {
-        modalHeader.innerHTML = '<h2>Confirm Deletion</h2>';
-        modalBody.innerHTML = `
-            <p>Do you want to delete this task?</p>
-            <button id="deleteForeverButton">Delete Forever</button>
-            <button id="cancelDeleteButton">Cancel</button>
-        `;
-        saveButton.style.display = 'none';
+ // Show modal for deleting task
+function showDeleteModal(taskElement, id) {
+    modalHeader.innerHTML = '<h2>Confirm Deletion</h2>';
+    modalBody.innerHTML = `
+        <p>Do you want to delete this task?</p>
+        <button id="deleteForeverButton">Delete Forever</button>
+        <button id="cancelDeleteButton">Cancel</button>
+    `;
+    saveButton.style.display = 'none';
 
-        document.getElementById('deleteForeverButton').onclick = () => {
+    document.getElementById('deleteForeverButton').onclick = () => {
+        // Show confirmation dialog
+        const confirmation = confirm("Are you sure you want to delete this task forever?");
+        if (confirmation) {
             fetch(`${BASE_URL}/tasks/${id}`, { method: 'DELETE' })
                 .then(() => {
                     taskElement.remove();
@@ -137,14 +141,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error(error);
                     displayMessage('Error deleting task: ' + error, 'error');
                 });
-        };
-
-        document.getElementById('cancelDeleteButton').onclick = () => {
+        } else {
             displayMessage('Task deletion canceled.', 'info');
             modal.style.display = 'none';
-        };
+        }
+    };
 
-        modal.style.display = 'flex';
+    document.getElementById('cancelDeleteButton').onclick = () => {
+        displayMessage('Task deletion canceled.', 'info');
+        modal.style.display = 'none';
+    };
+
+    modal.style.display = 'flex';
+}
+
     }
 
     // Mark task as complete
