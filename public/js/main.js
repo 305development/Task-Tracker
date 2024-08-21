@@ -104,17 +104,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Set a reminder
-    function setReminder(id) {
-        const reminder = prompt('Enter reminder text:');
-        if (reminder) {
+    function setReminder(id, taskElement) {
+        const existingReminder = taskElement.querySelector('.taskReminder').textContent;
+        const reminder = prompt('Enter or edit reminder text:', existingReminder);
+        const dueDate = taskElement.querySelector('.taskDueDate').textContent;
+        const alarmTime = prompt('Enter alarm time (HH:MM, 24-hour format):', dueDate.split(" ")[1]);
+
+        if (reminder && alarmTime) {
             fetch(`${BASE_URL}/tasks/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reminder })
+                body: JSON.stringify({ reminder, alarmTime })
             })
             .then(response => response.json())
             .then(updatedTask => {
+                taskElement.querySelector('.taskReminder').textContent = `Reminder: ${updatedTask.reminder}`;
                 displayMessage('Reminder set successfully.', 'success');
+
+                // Alarm functionality
+                const alarmDateTime = new Date(`${updatedTask.dueDate.split(" ")[0]} ${updatedTask.alarmTime}`);
+                const currentTime = new Date();
+
+                if (alarmDateTime > currentTime) {
+                    const timeDifference = alarmDateTime - currentTime;
+                    setTimeout(() => {
+                        alert(`Reminder: ${updatedTask.reminder}`);
+                    }, timeDifference);
+                }
             })
             .catch(error => {
                 console.error(error);
@@ -141,12 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="taskInfo">
                 <h3 class="taskTitle">${task.title}</h3>
                 <p class="taskDescription">${task.description}</p>
-                <p>Due Date: ${new Date(task.dueDate).toLocaleString()}</p>
+                <p class="taskDueDate">Due Date: ${new Date(task.dueDate).toLocaleString()}</p>
+                <p class="taskReminder">Reminder: ${task.reminder || 'None'}</p>
             </div>
             <button onclick="editTask('${task._id}', this.parentElement)">Edit</button>
             <button onclick="deleteTask('${task._id}', this.parentElement)">Delete</button>
             <button onclick="markTaskComplete('${task._id}', this.parentElement)">Mark Complete</button>
-            <button onclick="setReminder('${task._id}')">Set Reminder</button>
+            <button onclick="setReminder('${task._id}', this.parentElement)">Set Reminder</button>
         `;
         return taskElement;
     }
