@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageContainer = document.getElementById('messageContainer');
     const BASE_URL = 'http://localhost:5001';  // Ensure this matches your server's port
 
-    // Modals
+    // Create and add modal elements
     const modal = document.createElement('div');
     modal.classList.add('modal');
     document.body.appendChild(modal);
@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modalContent.appendChild(modalHeader);
 
     const modalBody = document.createElement('div');
+    modalBody.classList.add('modal-body');
     modalContent.appendChild(modalBody);
 
     const modalFooter = document.createElement('div');
@@ -117,20 +118,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Show modal for deleting task
- // Show modal for deleting task
-function showDeleteModal(taskElement, id) {
-    modalHeader.innerHTML = '<h2>Confirm Deletion</h2>';
-    modalBody.innerHTML = `
-        <p>Do you want to delete this task?</p>
-        <button id="deleteForeverButton">Delete Forever</button>
-        <button id="cancelDeleteButton">Cancel</button>
-    `;
-    saveButton.style.display = 'none';
+    function showDeleteModal(taskElement, id) {
+        modalHeader.innerHTML = '<h2>Confirm Deletion</h2>';
+        modalBody.innerHTML = `
+            <p>Do you want to delete this task?</p>
+            <button id="deleteForeverButton">Delete Forever</button>
+            <button id="cancelDeleteButton">Cancel</button>
+        `;
+        saveButton.style.display = 'none';
 
-    document.getElementById('deleteForeverButton').onclick = () => {
-        // Show confirmation dialog
-        const confirmation = confirm("Are you sure you want to delete this task forever?");
-        if (confirmation) {
+        document.getElementById('deleteForeverButton').onclick = () => {
             fetch(`${BASE_URL}/tasks/${id}`, { method: 'DELETE' })
                 .then(() => {
                     taskElement.remove();
@@ -141,20 +138,14 @@ function showDeleteModal(taskElement, id) {
                     console.error(error);
                     displayMessage('Error deleting task: ' + error, 'error');
                 });
-        } else {
+        };
+
+        document.getElementById('cancelDeleteButton').onclick = () => {
             displayMessage('Task deletion canceled.', 'info');
             modal.style.display = 'none';
-        }
-    };
+        };
 
-    document.getElementById('cancelDeleteButton').onclick = () => {
-        displayMessage('Task deletion canceled.', 'info');
-        modal.style.display = 'none';
-    };
-
-    modal.style.display = 'flex';
-}
-
+        modal.style.display = 'flex';
     }
 
     // Mark task as complete
@@ -230,7 +221,7 @@ function showDeleteModal(taskElement, id) {
         }, 3000);
     }
 
-    // Create a task element
+    // Create Task Element function
     function createTaskElement(task) {
         const taskElement = document.createElement('div');
         taskElement.classList.add('taskElement');
@@ -249,10 +240,6 @@ function showDeleteModal(taskElement, id) {
         return taskElement;
     }
 
-    window.showEditModal = showEditModal;
-    window.showDeleteModal = showDeleteModal;
-    window.markTaskComplete = markTaskComplete;
-    window.showReminderModal = showReminderModal;
-
+    // Initial load
     loadTasks();
 });

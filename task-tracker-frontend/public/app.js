@@ -52,7 +52,7 @@ async function handleFormSubmit(event) {
         }
         
         // Clear form and fetch updated tasks
-        taskForm.reset();
+        document.getElementById('taskForm').reset();
         document.getElementById('taskId').value = '';
         fetchTasks();
     } catch (error) {
@@ -60,25 +60,20 @@ async function handleFormSubmit(event) {
     }
 }
 
-async function deleteTask(id) {
-    try {
-        await fetch(`http://localhost:5001/tasks/${id}`, {
-            method: 'DELETE',
-        });
-        fetchTasks();
-    } catch (error) {
-        console.error('Error deleting task:', error);
-    }
-}
-
-function editTask(id) {
-    fetch(`http://localhost:5001/tasks/${id}`)
-        .then(response => response.json())
-        .then(task => {
-            document.getElementById('taskId').value = task._id;
-            document.getElementById('title').value = task.title;
-            document.getElementById('description').value = task.description;
-            document.getElementById('dueDate').value = new Date(task.dueDate).toISOString().slice(0, 16); // Format for datetime-local input
-        })
-        .catch(error => console.error('Error fetching task for editing:', error));
+function createTaskElement(task) {
+    const taskElement = document.createElement('div');
+    taskElement.classList.add('taskElement');
+    taskElement.innerHTML = `
+        <div class="taskInfo">
+            <h3 class="taskTitle">${task.title}</h3>
+            <p class="taskDescription">${task.description}</p>
+            <p class="taskDueDate">Due Date: ${new Date(task.dueDate).toLocaleString()}</p>
+            <p class="taskReminder">Reminder: ${task.reminder || 'None'}</p>
+        </div>
+        <button onclick="showEditModal(this.parentElement, '${task._id}')">Edit</button>
+        <button onclick="showDeleteModal(this.parentElement, '${task._id}')">Delete</button>
+        <button onclick="markTaskComplete('${task._id}', this.parentElement)">Mark Complete</button>
+        <button onclick="showReminderModal(this.parentElement, '${task._id}')">Set Reminder</button>
+    `;
+    return taskElement;
 }

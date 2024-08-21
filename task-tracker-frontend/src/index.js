@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const BASE_URL = 'http://localhost:5001';  // Ensure this matches your server's port
+const BASE_URL = 'http://localhost:5001';
 
 function TaskApp() {
     const [tasks, setTasks] = useState([]);
@@ -13,36 +13,36 @@ function TaskApp() {
 
     useEffect(() => {
         // Load tasks from the server
-        fetch(`${BASE_URL}/tasks`)
-            .then(response => response.json())
-            .then(data => setTasks(data))
-            .catch(error => setMessage('Error fetching tasks: ' + error));
+        const fetchTasks = async () => {
+            try {
+                const response = await fetch(`${BASE_URL}/tasks`);
+                const data = await response.json();
+                setTasks(data);
+            } catch (error) {
+                setMessage('Error fetching tasks: ' + error.message);
+            }
+        };
+        fetchTasks();
     }, []);
 
     function showDeleteModal(taskId) {
-        setModal({
-            open: true,
-            type: 'delete',
-            taskId
-        });
+        setModal({ open: true, type: 'delete', taskId });
     }
 
-    function handleDelete() {
-        fetch(`${BASE_URL}/tasks/${modal.taskId}`, { method: 'DELETE' })
-            .then(() => {
-                setTasks(tasks.filter(task => task._id !== modal.taskId));
-                setMessage('Task deleted permanently.');
-                setModal({ open: false, type: '', taskId: null });
-            })
-            .catch(error => {
-                setMessage('Error deleting task: ' + error);
-                setModal({ open: false, type: '', taskId: null });
-            });
-    }
-
-    function handleCloseModal() {
+    const handleDelete = async () => {
+        try {
+            await fetch(`${BASE_URL}/tasks/${modal.taskId}`, { method: 'DELETE' });
+            setTasks(tasks.filter(task => task._id !== modal.taskId));
+            setMessage('Task deleted permanently.');
+        } catch (error) {
+            setMessage('Error deleting task: ' + error.message);
+        }
         setModal({ open: false, type: '', taskId: null });
-    }
+    };
+
+    const handleCloseModal = () => {
+        setModal({ open: false, type: '', taskId: null });
+    };
 
     return (
         <div>

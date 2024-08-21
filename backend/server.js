@@ -1,97 +1,49 @@
-const express = require('express');
-const path = require('path');
-const cors = require('cors');
-const mongoose = require('mongoose');
-require('dotenv').config();
+// Existing code for modal creation and event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    const taskForm = document.getElementById('taskForm');
+    const taskList = document.getElementById('taskList');
+    const messageContainer = document.getElementById('messageContainer');
+    const BASE_URL = 'http://localhost:5001';
 
-// Initialize the Express app
-const app = express();
+    // Modal creation function
+    function createModal() {
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        document.body.appendChild(modal);
 
-// Use CORS middleware to handle requests from different origins
-app.use(cors());
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('modal-content');
+        modal.appendChild(modalContent);
 
-// Middleware to parse JSON bodies
-app.use(express.json());
+        const modalHeader = document.createElement('div');
+        modalHeader.classList.add('modal-header');
+        modalContent.appendChild(modalHeader);
 
-// Define the port
-const port = process.env.PORT || 5001;  // Using port 5001
+        const modalBody = document.createElement('div');
+        modalBody.classList.add('modal-body');
+        modalContent.appendChild(modalBody);
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+        const modalFooter = document.createElement('div');
+        modalFooter.classList.add('modal-footer');
+        modalContent.appendChild(modalFooter);
 
-// Define Task Schema and Model
-const taskSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: String,
-  dueDate: Date,
-  reminder: String,
-  alarmTime: String,
-  completed: { type: Boolean, default: false }
-});
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        modalHeader.appendChild(closeButton);
 
-const Task = mongoose.model('Task', taskSchema);
+        const saveButton = document.createElement('button');
+        saveButton.textContent = 'Save';
+        saveButton.style.display = 'none';
+        modalFooter.appendChild(saveButton);
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve index.html for root requests
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Get all tasks
-app.get('/tasks', async (req, res) => {
-    try {
-        const tasks = await Task.find();
-        res.json(tasks);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching tasks', error });
+        return { modal, modalBody, modalHeader, modalFooter, saveButton };
     }
-});
 
-// Add a new task
-app.post('/tasks', async (req, res) => {
-    try {
-        const task = new Task(req.body);
-        await task.save();
-        res.status(201).json(task);
-    } catch (error) {
-        res.status(400).json({ message: 'Error adding task', error });
-    }
-});
+    const { modal, modalBody, modalHeader, modalFooter, saveButton } = createModal();
 
-// Update a task
-app.put('/tasks/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const updatedTask = await Task.findByIdAndUpdate(id, req.body, { new: true });
-        if (!updatedTask) {
-            return res.status(404).json({ message: 'Task not found' });
-        }
-        res.json(updatedTask);
-    } catch (error) {
-        res.status(400).json({ message: 'Error updating task', error });
-    }
-});
-
-// Delete a task by ID
-app.delete('/tasks/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const result = await Task.findByIdAndDelete(id);
-        if (result) {
-            res.status(200).json({ message: 'Task deleted successfully' });
-        } else {
-            res.status(404).json({ message: 'Task not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to delete task', error });
-    }
-});
-
-// Start server
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    // Existing code for loading tasks, adding tasks, and handling modals
+    // Ensure that modal functionality and fetch calls are integrated correctly
 });
