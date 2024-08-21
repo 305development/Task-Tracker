@@ -76,7 +76,7 @@ app.put('/tasks/:id', async (req, res) => {
     }
 });
 
-// DELETE route for deleting a task
+// Delete a task by ID
 app.delete('/tasks/:id', async (req, res) => {
     const { id } = req.params;
     try {
