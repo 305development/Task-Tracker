@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Tracker</title>
-    <link rel="stylesheet" href="main.css"> <!-- Updated to main.css -->
+    <link rel="stylesheet" href="css/main.css"> <!-- Updated path for CSS -->
     <link rel="icon" href="data:,">
 </head>
 <body>
@@ -14,19 +14,19 @@
     <main>
         <form id="taskForm">
             <label for="title">Title:</label>
-            <input type="text" id="title" required>
+            <input type="text" id="title" required><br>
 
             <label for="description">Description:</label>
-            <textarea id="description"></textarea>
+            <textarea id="description"></textarea><br>
 
             <label for="dueDate">Due Date:</label>
-            <input type="datetime-local" id="dueDate" required>
+            <input type="datetime-local" id="dueDate" required><br>
 
             <button type="button" id="addTaskButton">Add Task</button>
         </form>
         <div id="taskList"></div>
         <div id="messageContainer"></div>
     </main>
-    <script src="scripts/main.js"></script>
+    <script src="js/main.js"></script> <!-- Updated path for JS -->
 </body>
 </html>
