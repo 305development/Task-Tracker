@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f0f8ff; /* Light blue background */
+    color: #333; /* Darker text for better readability */
 }
 
 header {
@@ -24,6 +25,8 @@ main {
     margin: 10px 0;
     border-radius: 5px;
     text-align: center;
+    font-weight: bold;
+    color: #333;
 }
 
 #taskForm {
@@ -86,4 +89,112 @@ main {
 
 .taskElement button:hover {
     background-color: #1e90ff; /* Dodger blue */
+}
+
+/* Modals */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4); /* Black with opacity */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 500px;
+}
+
+.modal-header, .modal-footer {
+    padding: 10px;
+    text-align: right;
+}
+
+.modal-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-footer {
+    border-top: 1px solid #ddd;
+}
+
+.modal-footer button {
+    background-color: #00bfff; /* Deep sky blue */
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+
+.modal-footer button:hover {
+    background-color: #1e90ff; /* Dodger blue */
+}
+
+@media (max-width: 768px) {
+    header {
+        font-size: 1.2em; /* Slightly smaller text */
+        padding: 10px;
+    }
+
+    main {
+        margin: 10px;
+    }
+
+    #taskForm {
+        padding: 15px;
+    }
+
+    #taskForm input, #taskForm textarea, #taskForm button {
+        padding: 6px;
+    }
+
+    .taskElement {
+        padding: 10px;
+    }
+
+    .taskElement button {
+        padding: 6px;
+        margin-right: 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        font-size: 1em; /* Smaller text */
+        padding: 8px;
+    }
+
+    main {
+        margin: 5px;
+    }
+
+    #taskForm {
+        padding: 10px;
+    }
+
+    #taskForm input, #taskForm textarea, #taskForm button {
+        padding: 4px;
+    }
+
+    .taskElement {
+        padding: 8px;
+    }
+
+    .taskElement button {
+        padding: 4px;
+        margin-right: 2px;
+    }
 }

@@ -16,18 +16,11 @@ async function fetchTasks() {
 }
 
 function displayTasks(tasks) {
-    const taskList = document.getElementById('tasks');
+    const taskList = document.getElementById('taskList');
     taskList.innerHTML = '';
     tasks.forEach(task => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>${task.title}</strong>
-            <p>${task.description}</p>
-            <p>Due Date: ${new Date(task.dueDate).toLocaleDateString()}</p>
-            <button onclick="editTask('${task.id}')">Edit</button>
-            <button onclick="deleteTask('${task.id}')">Delete</button>
-        `;
-        taskList.appendChild(li);
+        const taskElement = createTaskElement(task);
+        taskList.appendChild(taskElement);
     });
 }
 
@@ -82,10 +75,10 @@ function editTask(id) {
     fetch(`http://localhost:5001/tasks/${id}`)
         .then(response => response.json())
         .then(task => {
-            document.getElementById('taskId').value = task.id;
+            document.getElementById('taskId').value = task._id;
             document.getElementById('title').value = task.title;
             document.getElementById('description').value = task.description;
-            document.getElementById('dueDate').value = task.dueDate.slice(0, 10); // Format for date input
+            document.getElementById('dueDate').value = new Date(task.dueDate).toISOString().slice(0, 16); // Format for datetime-local input
         })
         .catch(error => console.error('Error fetching task for editing:', error));
 }
