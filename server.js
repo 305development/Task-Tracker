@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
@@ -27,7 +26,9 @@ const taskSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
   dueDate: Date,
-  completed: { type: Boolean, default: false },
+  reminder: String,
+  alarmTime: String,
+  completed: { type: Boolean, default: false }
 });
 
 const Task = mongoose.model('Task', taskSchema);
@@ -75,20 +76,22 @@ app.put('/tasks/:id', async (req, res) => {
     }
 });
 
-// Delete a task
+// DELETE route for deleting a task
 app.delete('/tasks/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const result = await Task.findByIdAndDelete(id);
-        if (!result) {
-            return res.status(404).json({ message: 'Task not found' });
+        if (result) {
+            res.status(200).json({ message: 'Task deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Task not found' });
         }
-        res.status(204).end();
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting task', error });
+        res.status(500).json({ message: 'Failed to delete task', error });
     }
 });
 
+// Start server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
